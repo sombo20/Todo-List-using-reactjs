@@ -1,59 +1,66 @@
 import "./App.css";
 import TodoInput from "./TodoInput";
 import TodoItem from "./TodoItem";
-import {useState} from 'react';
+import {
+    useState
+} from 'react';
 
 function App() {
-    const [todoItems, setTodoItems] = useState(
-[])
+    const [todoItems, setTodoItems] = useState([])
 
-const createTodoItem = (todo) => {
-const newTodoItems = [...todoItems, { todo, complete: false }];
-setTodoItems(newTodoItems);
-};
+    const createTodoItem = (todo) => {
+        const id = (new Date()).getTime()
+        const newTodoItems = [...todoItems, {
+            todo,
+            complete: false,
+            id
+        }];
+        setTodoItems(newTodoItems);
+    };
 
-const deleteTodoItem = (index) => {
-const newTodoItems = [...todoItems]
-newTodoItems.splice(index, 1)
-setTodoItems(newTodoItems)
-}
+    const deleteTodoItem = (id) => {
+        const newTodoItems = todoItems.filter(item => item.id !== id)
+        setTodoItems(newTodoItems)
+    }
 
-const completeTodoItem = (index) => {
-const newTodoItems = [...todoItems];
-newTodoItems[index].complete === false
-? (newTodoItems[index].complete = true)
-: (newTodoItems[index].complete = false);
-setTodoItems(newTodoItems)
-};
+    const completeTodoItem = (id) => {
+        const newTodoItems = todoItems.map(item => item.id === id ? {
+            ...item,
+            complete: !item.complete
+        } : item);
 
-const updateTodoItem = (index) => {
-const newTodoItems = [...todoItems];
-const item = newTodoItems[index];
-let newItem = prompt(`Update ${item.todo}?`, item.todo);
-let todoObj = { todo: newItem, complete: false };
-newTodoItems.splice(index, 1, todoObj);
-if (newItem === null || newItem === "") {
-return;
-} else {
-item.todo = newItem;
-}
-setTodoItems(newTodoItems);
-};
+        setTodoItems(newTodoItems)
+    };
 
-return (
-<div className="app">
-<TodoInput createTodoItem={createTodoItem} />
-{todoItems.map((item, index) => (
-<TodoItem
-key={index}
-index={index}
-item={item}
-deleteTodoItem={deleteTodoItem}
-completeTodoItem={completeTodoItem}
-updateTodoItem={updateTodoItem}
-/>
-))}
-</div>
-);
+    const updateTodoItem = (id) => {
+        const todo = todoItems.find(item => item.id === id)
+        const newValue = prompt(`Update ${todo.todo}?`, todo.todo);
+        
+        if (!newValue) {
+            return
+        }
+
+        const newTodoItems = todoItems.map(item => item.id === id ? {
+            ...item,
+            todo: newValue
+        } : item)
+
+        setTodoItems(newTodoItems);
+    };
+
+    return (
+        <div className="app">
+        <TodoInput createTodoItem={createTodoItem} />
+        {todoItems.map((item) => (
+            <TodoItem
+                key={item.id}
+                item={item}
+                deleteTodoItem={deleteTodoItem}
+                completeTodoItem={completeTodoItem}
+                updateTodoItem={updateTodoItem}
+            />
+        ))}
+    </div>
+    );
 }
 export default App;
